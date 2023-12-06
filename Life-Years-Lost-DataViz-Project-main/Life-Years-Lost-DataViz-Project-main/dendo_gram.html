@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3.js Chart</title>
+    <!-- D3.js Script -->
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+    <div id="chart"></div>
+
+    <!-- JavaScript Code -->
+    <script>
+        // Data structure
+        const data = {
+  name: "Suicide Data",
+  children: [
+    {
+      name: "Gender",
+      children: [
+        { name: "Male" },
+        { name: "Female" }
+      ]
+    },
+    {
+      name: "hispanic_originrace_recode",
+      children: [
+        { name: "Non - Hispanic other races" },
+        { name: "Non - Hispanic white" },
+        { name: "Hispanic origin unknown" },
+        { name: "Non - Hispanic black" },
+        { name: "Puerto Rican" },
+        { name: "Other or unknown Hispanic" },
+        { name: "Mexican" },
+        { name: "Cuban" },
+        { name: "Central or South American" }
+      ]
+    },
+    {
+      name: "resident_status",
+      children: [
+        { name: "RESIDENTS" },
+        { name: "INTRASTATE NONRESIDENTS" },
+        { name: "INTERSTATE NONRESIDENTS" },
+        { name: "FOREIGN RESIDENTS" }
+      ]
+    },
+    {
+      name: "education_2003_revision",
+      children: [
+        { name: "9 - 12th grade, no diploma" },
+        { name: "high school graduate or GED completed" },
+        { name: "Bachelor’s degree" },
+        { name: "Master’s degree" },
+        { name: "some college credit, but no degree" },
+        { name: "Unknown" },
+        { name: "8th grade or less" },
+        { name: "Associate degree" },
+        { name: "Doctorate or professional degree" }
+      ]
+    },
+    {
+      name: "education_reporting_flag",
+      children: [
+        { name: "2003 revision of education item on certificate" },
+        { name: "1989 revision of education item on certificate" }
+      ]
+    },
+    {
+      name: "month_of_death",
+      children: [
+        { name: "January" },
+        { name: "February" },
+        { name: "March" },
+        { name: "April" },
+        { name: "May" },
+        { name: "June" },
+        { name: "July" },
+        { name: "August" },
+        { name: "September" },
+        { name: "October" },
+        { name: "November" },
+        { name: "December" }
+      ]
+    },
+    {
+      name: "sex",
+      children: [
+        { name: "Male" },
+        { name: "Female" }
+      ]
+    },
+    {
+      name: "detail_age_type",
+      children: [
+        { name: "Years" },
+        { name: "Months" }
+      ]
+    },
+    {
+      name: "race",
+      children: [
+        { name: "American Indian (includes Aleuts and Eskimos)" },
+        { name: "White" },
+        { name: "Samoan" },
+        { name: "Filipino" },
+        { name: "Black" },
+        { name: "Other Asian or Pacific Islander in areas reporting codes 18-58" },
+        { name: "Combined other Asian or Pacific Islander, includes codes 18-68" },
+        { name: "Korean" },
+        { name: "Asian Indian" },
+        { name: "Vietnamese" },
+        { name: "Japanese" },
+        { name: "Chinese" },
+        { name: "Guamanian" },
+        { name: "Hawaiian (includes Part-Hawaiian)" }
+      ]
+    },
+    {
+      name: "place_of_death_and_decedents_status",
+      children: [
+        { name: "Other" },
+        { name: "Decedent’s home" },
+        { name: "Hospital, Clinic or Medical Center" },
+        { name: "Nursing home/long term care" },
+        { name: "Place of death unknown" },
+        { name: "Hospice facility" }
+      ]
+    },
+    {
+      name: "marital_status",
+      children: [
+        { name: "Never married, single" },
+        { name: "Married" },
+        { name: "Divorced" },
+        { name: "Marital Status unknown" },
+        { name: "Widowed" }
+      ]
+    },
+    {
+      name: "day_of_week_of_death",
+      children: [
+        { name: "Sunday" },
+        { name: "Saturday" },
+        { name: "Tuesday" },
+        { name: "Wednesday" },
+        { name: "Friday" },
+        { name: "Thursday" },
+        { name: "Monday" },
+        { name: "Unknown" }
+      ]
+    },
+    {
+      name: "current_data_year",
+      children: [
+        { name: "2015" },
+        { name: "2014" },
+        { name: "2013" },
+        { name: "2011" },
+        { name: "2010" },
+        { name: "2005" },
+        { name: "2006" },
+        { name: "2007" },
+        { name: "2008" },
+        { name: "2009" }
+      ]
+    },
+    {
+      name: "injury_at_work",
+      children: [
+        { name: "No" },
+        { name: "Unknown" },
+        { name: "Yes" }
+      ]
+    },
+    {
+      name: "manner_of_death",
+      children: [
+        { name: "Suicide" }
+      ]
+    },
+    {
+      name: "method_of_disposition",
+      children: [
+        { name: "Burial" },
+        { name: "Cremation" },
+        { name: "R" },
+        { name: "Other" },
+        { name: "Unknown" },
+        { name: "D" },
+        { name: "E" }
+      ]
+    },
+    {
+      name: "autopsy",
+      children: [
+        { name: "No" },
+        { name: "Yes" },
+        { name: "Unknown" }
+      ]
+    }
+    // ... other children can be added here
+  ]
+};
+
+
+
+        // Chart generation code
+        const width = 928;
+        const height = width;
+        const cx = width * 0.5;
+        const cy = height * 0.54;
+        const radius = Math.min(width, height) / 2 - 80;
+
+        const tree = d3.cluster()
+            .size([2 * Math.PI, radius])
+            .separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth);
+
+        const root = tree(d3.hierarchy(data)
+            .sort((a, b) => d3.ascending(a.data.name, b.data.name)));
+
+        const svg = d3.create("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .attr("viewBox", [-cx, -cy, width, height])
+            .attr("style", "width: 100%; height: auto; font: 10px sans-serif;");
+
+        svg.append("g")
+            .attr("fill", "none")
+            .attr("stroke", "#555")
+            .attr("stroke-opacity", 0.4)
+            .attr("stroke-width", 1.5)
+            .selectAll("path")
+            .data(root.links())
+            .join("path")
+                .attr("d", d3.linkRadial()
+                    .angle(d => d.x)
+                    .radius(d => d.y));
+
+        svg.append("g")
+            .selectAll("circle")
+            .data(root.descendants())
+            .join("circle")
+                .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
+                .attr("fill", d => d.children ? "#555" : "#999")
+                .attr("r", 2.5);
+
+        svg.append("g")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-width", 3)
+            .selectAll("text")
+            .data(root.descendants())
+            .join("text")
+                .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0) rotate(${d.x >= Math.PI ? 180 : 0})`)
+                .attr("dy", "0.31em")
+                .attr("x", d => d.x < Math.PI === !d.children ? 6 : -6)
+                .attr("text-anchor", d => d.x < Math.PI === !d.children ? "start" : "end")
+                .attr("paint-order", "stroke")
+                .attr("stroke", "white")
+                .attr("fill", "currentColor")
+                .text(d => d.data.name);
+
+        // Append the SVG to a specific element
+        document.getElementById('chart').appendChild(svg.node());
+    </script>
+</body>
+</html>

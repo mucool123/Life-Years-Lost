@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<!-- Add 2 buttons -->
+<button onclick="update('Male')">Men</button>
+<button onclick="update('Female')">Women</button>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+<script>
+// set the dimensions and margins of the graph
+var margin = {top: 50, right: 30, bottom: 70, left: 60},
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// Data
+var data = [
+  {year: "2005", Male: 26108, Female: 6814},
+  {year: "2006", Male: 26488, Female: 7057},
+  {year: "2007", Male: 27422, Female: 7394},
+  {year: "2008", Male: 28596, Female: 7647},
+  {year: "2009", Male: 29290, Female: 7901},
+  {year: "2010", Male: 30512, Female: 8185},
+  {year: "2011", Male: 31220, Female: 8639},
+  {year: "2013", Male: 32282, Female: 9213},
+  {year: "2014", Male: 33354, Female: 9773},
+  {year: "2015", Male: 13703, Female: 4069}
+];
+
+var x = d3.scaleBand()
+  .range([0, width])
+  .padding(1);
+var xAxis = svg.append("g")
+  .attr("transform", "translate(0," + height + ")")
+
+// Initialize the Y axis
+var y = d3.scaleLinear()
+  .range([height, 0])
+  .domain([0, 40000]);
+var yAxis = svg.append("g")
+  .attr("class", "myYaxis")
+
+// Color scale
+var color = d3.scaleSequential(d3.interpolatePlasma)
+  .domain([0, 40000]);
+
+// A function that create / update the plot for a given variable:
+function update(selectedVar) {
+    // X axis
+    x.domain(data.map(function(d) { return d.year; }))
+    xAxis.transition().duration(1000).call(d3.axisBottom(x))
+        .selectAll("text")
+        .style("fill", "white"); // Change the color of x-axis labels
+
+    // Y axis
+    yAxis.transition().duration(1000).call(d3.axisLeft(y))
+        .selectAll("text")
+        .style("fill", "white"); // Change the color of y-axis labels
+
+    // Update styles for ticks
+    svg.selectAll('.tick line').style('stroke', 'white'); // Change the color of ticks
+
+
+    // Lines (sticks)
+    var lineData = data.map(function(d) {
+        return { x1: x(d.year), x2: x(d.year), y1: y(0), y2: y(d[selectedVar]) };
+    });
+
+    var lines = svg.selectAll(".line")
+        .data(lineData);
+
+    lines.enter()
+        .append("line")
+        .attr("class", "line")
+        .merge(lines)
+        .transition()
+        .duration(1000)
+        .attr("x1", function(d) { return d.x1; })
+        .attr("x2", function(d) { return d.x2; })
+        .attr("y1", function(d) { return d.y1; })
+        .attr("y2", function(d) { return d.y2; })
+        .attr("stroke", "grey");
+
+    lines.exit().remove();
+
+    // Circles (lollipops)
+    var circles = svg.selectAll(".circle")
+        .data(data);
+
+    circles.enter()
+        .append("circle")
+        .attr("class", "circle")
+        .merge(circles)
+        .transition()
+        .duration(1000)
+        .attr("cx", function(d) { return x(d.year); })
+        .attr("cy", function(d) { return y(d[selectedVar]); })
+        .attr("r", 8)
+        .attr("fill", function(d) { return color(d[selectedVar]); });
+
+    circles.exit().remove();
+}
+
+// Initialize plot
+update('Male')
+</script>

@@ -1,0 +1,391 @@
+<!DOCTYPE HTML PUBLIC>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+
+	<!--
+	Developed by Shreyas,Mukul, Hymavathi by refercing the code from Periscopic
+	Visualization produced using EaselJS: http://createjs.com/#!/EaselJS
+	Animation driven by Greensock Animation Platform: http://www.greensock.com/gsap-js/
+	Shapes provided by Pierre Bezier, with help from Paul de Casteljau.
+	Time support by Moment.js: http://momentjs.com/
+	Site state changes and URLs by History.js: https://github.com/balupton/history.js
+	-->
+
+	<title>U.S. Suicide Deaths</title>
+
+	<link rel="stylesheet" type="text/css" href="dataviz.css" media="all">
+	<link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,900,300italic,400italic,700italic,900italic' rel='stylesheet'
+	 type='text/css'>
+
+	<!-- <script type="text/javascript" src="libraries/dictionary.js"></script>
+	<script type="text/javascript" src="libraries/easeljs-0.5.0.min.js"></script>-->
+	<script type="text/javascript" src="libraries/TweenMax.min.js"></script>
+	<script type="text/javascript" src="libraries/BezierPlugin.min.js"></script>
+	<!--<script type="text/javascript" src="libraries/Tooltip.js"></script>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script type="text/javascript" src="libraries/moment.min.js"></script>
+	<script type="text/javascript" src="libraries/jquery.history.js"></script>
+	<script type="text/javascript" src="libraries/cookies.min.js"></script> -->
+	<script src="createjs.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Include your generated .js file -->
+
+</head>
+
+<body>
+	<div id="container" class="intro">
+		<div class="header">
+			<h1>U.S. Suicide Deaths -</h1>
+			<div class="curView leftView">
+				<span id="curYearLabel">2015</span>
+			</div>
+			<h2 id="monthLabel"></h2>
+		</div>
+		<div id="peoplebox">
+			<span id="peoplecount" onselectstart="return false;">0</span>
+			<br>
+			<span id="peoplelabel" onselectstart="return false;">PEOPLE KILLED</span>
+		</div>
+		<div id="sinceNumBox"></div>
+		<div id="yearsbox">
+			<span id="yearscount" onselectstart="return false;">0</span>
+			<br>
+			<span id="yearlabel" onselectstart="return false;">LOST YEARS</span>
+		</div>
+
+		<div id="c">
+			<canvas id="stage" width="940" height="625"></canvas>
+			<canvas id="distributionView" width="940" height="625"></canvas>
+			<canvas id="overstage" width="940" height="625"></canvas>
+			<div class="leftWhiteLabel filterName" id="topFilter"></div>
+		</div>
+
+		<hr class="axis" style="top: 346px; border-width: 0px 2px 1px 2px;">
+		<hr class="axis" style="top: 350px; border-width: 0px 2px 0px 2px;">
+		<span class="axisLabel" style="left: 50px;">AGE 0</span>
+		<span class="axisLabel maxAgeLabel" style="left: 964px;">100</span>
+
+		<div id="distSwitch"></div>
+
+		<span class="leftWhiteLabel percent" id="pctBot" onselectstart="return false;">0%</span>
+		<span class="filterLabel leftWhiteLabel filterLabelText" id="botFilter"></span>
+
+		<span class="rightWhiteLabel" id="topHistLabel"></span>
+		<span class="rightWhiteLabel" id="stolenTopLabel"></span>
+
+		<div id="menuContainer">
+			<div id="menuInnerDiv">
+				<ul id="menuBox"></ul>
+			</div>
+		</div>
+
+		<div id="findings">
+		</div>
+
+		
+	</div>
+
+	<script type="text/javascript">
+	(function(){
+		var main = document.createElement('script');
+		main.type = 'text/javascript';
+		main.src = 'main.bundle.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(main, s);
+	})();
+	</script>
+
+    <div id="contentWrapperL" style="display: flex; align-items: flex-start; justify-content: center;">
+        <!-- New container for heading and text -->
+        <div id="additionalInfoL">
+            <h2>Exploring the data with the Dendogram</h2>
+            <hr>
+            <p>> The dataset contains information on suicide fatalities in the USA spanning a 9-year period.</p>
+            <p>> It has 32 columns and 355667 entries.</p>
+            <p>> The dataset is not having data for 2012.</p>
+
+            <!-- Add more text or elements as needed -->
+        </div>
+    
+        <!-- iframe plot -->
+        <iframe src="dendo_gram.html" width="800" height="1000"></iframe>
+    </div>
+
+
+    <div id="contentWrapperR" style="display: flex; align-items: flex-start;">
+        <!-- iframe plot -->
+        <iframe src="heatmap.html" width="800" height="600"></iframe>
+    
+        <!-- New container for heading and text -->
+        <div id="additionalInfo">
+            <h2>Heatmap revealing the temporal distribution of suicide fatalities</h2>
+            <hr>
+            <p>> February is having significantly less suicide fatalities than other months.</p>
+            <p>> However, May and July has more suicide fatalities than any other time in the year.</p>
+            <p>> The highest suicide incidents in the dataset occured in August and September 2014.</p>
+
+            <!-- Add more text or elements as needed -->
+        </div>
+    </div>
+
+    <div id="contentWrapperL" style="display: flex; align-items: flex-start; justify-content: center;">
+        <!-- New container for heading and text -->
+        <div id="additionalInfoL">
+            <h2>Education-Level Insights in a Pie Chart</h2>
+            <hr>
+            <p>> 38.8% of the people who ended their life were high school graduates or GED complted. </p>
+            <p>> Higher education attainment is associated with notably lower rates of suicide.</p>
+            <!-- Add more text or elements as needed -->
+        </div>
+    
+        <!-- iframe plot -->
+        <iframe src="education_loans.html" width="800" height="600"></iframe>
+    </div>
+
+
+    <div id="contentWrapperL" style="display: flex; align-items: flex-start; justify-content: center;">
+    <!-- iframe plot -->
+    <iframe src="races.html" width="1400" height="800"></iframe>
+    </div>
+
+
+    <div id="contentWrapperL" style="display: flex; align-items: flex-start; justify-content: center;">
+        <!-- New container for heading and text -->
+        <div id="additionalInfoL">
+            <h2>Mosaic of Gender and Maritial Status</h2>
+            <hr>
+            <p>> Dataset has 5 Maritial Statuses and 2 Genders.</p>
+            <p>> Men accounted for a significantly higher number of suicides among individuals of various marital statuses.</p>
+            <!-- Add more text or elements as needed -->
+        </div>
+    
+        <!-- iframe plot -->
+        <iframe src="marital_sex.html" width="800" height="600"></iframe>
+    </div>
+
+    <div id="contentWrapperR" style="display: flex; align-items: flex-start;">
+        <!-- iframe plot -->
+        <iframe src="marital_age.html" width="800" height="600"></iframe>
+    
+        <!-- New container for heading and text -->
+        <div id="additionalInfo">
+            <h2>A box plot analysis of age distributions segmented by the marital status</h2>
+            <hr>
+            <p>> Individuals who had maritial status as divorced, married, or have an unknown mostly ended their life between the ages of 40 and 60 years.</p>
+            <p>> Individuals who were never married or remained single took their own life at a comparatively younger age than those with other marital statuses.</p>
+            <!-- Add more text or elements as needed -->
+        </div>
+    </div>
+
+    <div id="contentWrapperL" style="display: flex; align-items: flex-start; justify-content: center;">
+        <!-- New container for heading and text -->
+        <div id="additionalInfoL">
+            <h2>Threads of Tragedy: A Sankey Chart</h2>
+            <hr>
+            <p>> Lenght is one of the best visual perception of quantities.</p>
+            <p>> Lenght of Male thread reveals that Men are around 70%.</p>
+            <p>> The trend continues and among all maritial status Male are around 70%.</p>
+
+            <!-- Add more text or elements as needed -->
+        </div>
+    
+        <!-- iframe plot -->
+        <iframe src="resident_death.html" width="800" height="600"></iframe>
+    </div>
+
+    <div id="contentWrapperR" style="display: flex; align-items: flex-start;">
+        <!-- iframe plot -->
+        <iframe src="suicide_year.html" width="800" height="600"></iframe>
+    
+        <!-- New container for heading and text -->
+        <div id="additionalInfo">
+            <h2>Yearly Suicidal Trends Visualized</h2>
+            <hr>
+            <p>> Trend shows gradual increase of suicidal tragedies from 2005 till 2014, where it peaked with a saddening 43127 losses.</p>
+            <p>> Then number of sucidal deaths plummeted in 2015.</p>
+            <!-- Add more text or elements as needed -->
+        </div>
+    </div>
+
+    <div id="contentWrapperL" style="display: flex; align-items: flex-start; justify-content: center;">
+        <!-- New container for heading and text -->
+        <div id="additionalInfo">
+            <h2>Lolipop Chart and KDE PLot</h2>
+            <hr>
+            <p>> The trend of gradual increase and sudden drop in suicidal deaths is same among the both genders.</p>
+            <p>> KDE Plot for representing density distribution of age and resident status.</p>
+            <!-- Add more text or elements as needed -->
+        </div>
+    
+        <!-- iframe plot -->
+        <iframe src="loli.html" width="1000" height="600"></iframe>
+        <img src="kde.jpeg" alt="KDE" style="max-height: 400px;">
+
+    </div>
+
+
+
+    <div id="contentWrapperR" style="display: flex; align-items: flex-start;">
+        <!-- iframe plot -->
+        <iframe src="resident_status.html" width="800" height="600"></iframe>
+    
+        <!-- New container for heading and text -->
+        <div id="additionalInfo">
+            <h2>Exploded Sclice Pie Chart</h2>
+            <hr>
+            <p>> The majority of individuals who passed away by suicide were residents, making 86% of all. </p>
+            <p>> Interstate non-residents and foreign residents make up to a significant portion of the remaining 14% of fatalities.</p>
+            <!-- Add more text or elements as needed -->
+        </div>
+    </div>
+
+    <div id="contentWrapperL" style="display: flex; align-items: flex-start; justify-content: center;">
+        <!-- New container for heading and text -->
+        <div id="additionalInfoL">
+            <h2>Stacked Bar Chart - Residential Status Suicide Deaths</h2>
+            <hr>
+            <p>> The number of Intrastate Non-residents is almost uniform among all years and is between 3000 to 4000.</p>
+            <p>> Similarly, the number of Interstate Non-residents is also somewhat uniform among all years, however trend for Residents is increasing steadily.</p>
+            <!-- Add more text or elements as needed -->
+        </div>
+    
+        <!-- iframe plot -->
+        <iframe src="residentstatus_death.html" width="800" height="600"></iframe>
+    </div>
+ 
+
+    <div id="contentWrapperR" style="display: flex; align-items: flex-start;">
+        <!-- iframe plot -->
+        <iframe src="deathdecedent.html" width="800" height="600"></iframe>
+    
+        <!-- New container for heading and text -->
+        <div id="additionalInfo">
+            <h2>Statistical breakdown of suicide fatality locations</h2>
+            <hr>
+            <p>> Most individuals chose to spend their final moments at home.</p>
+            <p>> Even hospice and long-term care centers could not suffice the losses.</p>
+            <!-- Add more text or elements as needed -->
+        </div>
+    </div>
+
+    <div id="contentWrapperL" style="display: flex; align-items: flex-start; justify-content: center;">
+        <!-- New container for heading and text -->
+        <div id="additionalInfoL">
+            <h2> Histogram: Using Counts #1</h2>
+            <hr>
+            <p>> The number of individuals till the age of 49 were significantly more with a difference of around 50,000. </p>
+            <p>> Seems a right skeewed chart, right ? Let's see what happens with more bins.</p>
+            <!-- Add more text or elements as needed -->
+        </div>
+    
+        <!-- iframe plot -->
+        <iframe src="hist_detail_age.html" width="800" height="600"></iframe>
+    </div>
+
+    <div id="contentWrapperR" style="display: flex; align-items: flex-start;">
+        <!-- iframe plot -->
+        <iframe src="hist_detail_age_1.html" width="800" height="600"></iframe>
+    
+        <!-- New container for heading and text -->
+        <div id="additionalInfo">
+            <h2>Histogram: Using Counts #2</h2>
+            <hr>
+            <p>> Increasing the number of bins changes the perception of distribution of the data.</p>
+            <p>> More number of bins is making the distribution bi-modal now.</p>
+            <p>> The most number of count is for individuals aged between 48-51.</p>
+
+            <!-- Add more text or elements as needed -->
+        </div>
+    </div>
+
+    <div id="contentWrapperL" style="display: flex; align-items: flex-start; justify-content: center;">
+        <!-- New container for heading and text -->
+        <div id="additionalInfoL">
+            <h2>Histogram: Using Density #3</h2>
+            <hr>
+            <p>> We are using a more 'correct' approach where we are using density than count for determining the heights of the bars.</p>
+            <p>> With density, we are not being mislead about the distribution of the data.</p>
+            <p>> The age group 50-54 has the highest probabily according to this chart.</p>
+            <!-- Add more text or elements as needed -->
+        </div>
+    
+        <!-- iframe plot -->
+        <iframe src="hist_detail_age_detail.html" width="800" height="600"></iframe>
+    </div>
+
+    
+    
+    <!-- New Section above Footer -->
+    <div id="lessons-resources-section">
+        <div class="column" id="lessons-learned">
+            <h3 style="text-align: center;">Lessons Learned</h3>
+            <p>1. Perceptions of quantities - It can be observed particularly in the Sankey diagram, how easily Legth can be perceived.</p>
+            <p>2. Colorblind-friendly color schemes - We attempted to use the color scheme which is Colorblind-friendly and also maintained the same color scheme across all the plots.</p>
+            <p>3. Contrasting colors to reduce confusion - We used contrasting colors for better visual clarity.</p>
+            <p>4. We aimed to minimize the ink-to-data ratio, following Tufte's principle, and also strived to reduce clutter.</p>
+        </div>
+    
+        <div class="column" id="resources">
+            <h3>Resources</h3>
+            <a href="https://www.in.gov/issp/" target="_blank">
+                <img src="ribbon.gif" alt="Resource Image" style="max-height: 400px;">
+            </a>
+            <!-- Add more content as needed -->
+        </div>
+    </div>
+    
+    <!-- Footer Section -->
+    <!-- ... -->
+    </body>
+    
+    </html>
+
+
+
+
+    <!-- Other HTML content above... -->
+    
+    <!-- Footer Section -->
+    <div id="footer">
+        <hr> <!-- Line separator -->
+        <div id="footer-content" style="display: flex; justify-content: space-around; padding: 20px; text-align: center;">
+            <!-- Creators Column -->
+            <div class="footer-column">
+                <h3>Creators</h3>
+                <p>1. Hymavathi Gummudala</p>
+                <p>2. Mukul Gharpure</p>
+                <p>3. Shreyas Aswar</p>
+
+                <!-- Add more creators as needed -->
+            </div>
+    
+            <!-- References Column -->
+            <div class="footer-column">
+                <h3>References</h3>
+                <p>Arc Animation is heavily refrenced from <a href="https://periscopic.com/#!/impacts/stolen-years&impact-area=awareness" target="_blank">Periscope.</a></p>
+                <p>https://d3js.org/</p>
+                <p>https://observablehq.com/@d3/gallery</p>
+                <p>Data Visualization Course by Prof. YY Ahn</p>
+                <!-- Add more references as needed -->
+            </div>
+    
+            <!-- Sources Column -->
+            <div class="footer-column">
+                <h3>Sources</h3>
+                <p> <a href="https://www.kaggle.com/datasets/cdc/mortality" target="_blank">Dataset.</a> from Kaggle</p>
+                <p>US Census Bureau for expected age calculations</p>
+                <p>National Center for Health Statistics</p>
+                <!-- Add more sources as needed -->
+            </div>
+        </div>
+    </div>
+    
+    </body>
+    
+    </html>
+
+
+</body>
+
+</html>
